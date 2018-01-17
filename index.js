@@ -7,6 +7,7 @@
  *    - {function} callback - fired when user is idle
  *    - {function} activeCallback - fired when user is active
  *    - {Number} idleTime - time in milliseconds  
+ *    - {iFrameId} optional iframe to which the events should be attached to (only after loaded)
  */
 
 module.exports = idleTimer;
@@ -16,6 +17,7 @@ function idleTimer(options) {
   var callback = options.callback || function() {};
   var activeCallback = options.activeCallback || function() {};
   var idleTime = options.idleTime || 60000;
+  var iFrameId = options.iFrameId || false;
   var isActive = true;
   var timer;
 
@@ -23,10 +25,20 @@ function idleTimer(options) {
   activate();
 
   function addOrRemoveEvents(addOrRemove) {
-    window[addOrRemove]('load', activate);
-    document[addOrRemove]('mousemove', activate);
-    document[addOrRemove]('scroll', activate);
-    document[addOrRemove]('keypress', activate);
+    if(iFrameId != false){
+        document.getElementById(iFrameId).contentWindow.document[addOrRemove]('click', activate);
+        document.getElementById(iFrameId).contentWindow.document[addOrRemove]('mousemove', activate);
+        document.getElementById(iFrameId).contentWindow.document[addOrRemove]('scroll', activate);
+        document.getElementById(iFrameId).contentWindow.document[addOrRemove]('keypress', activate);
+        document.getElementById(iFrameId).contentWindow.document[addOrRemove]('touchstart', activate);
+    }else{
+        window[addOrRemove]('load', activate);
+        document[addOrRemove]('click', activate);
+        document[addOrRemove]('mousemove', activate);
+        document[addOrRemove]('scroll', activate);
+        document[addOrRemove]('keypress', activate);
+        document[addOrRemove]('touchstart', activate);
+    }
   }
 
   function activate() {
